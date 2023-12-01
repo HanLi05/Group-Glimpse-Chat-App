@@ -39,7 +39,6 @@ class AuthService extends ChangeNotifier{
         'uid' : userCredential.user!.uid,
         'email': email,
         'username': username,
-        'groups': []
       });
 
       return userCredential;

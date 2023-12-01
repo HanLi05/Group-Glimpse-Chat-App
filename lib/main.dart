@@ -1,6 +1,7 @@
 import 'package:bro/firebase_options.dart';
 import 'package:bro/services/auth/auth_gate.dart';
 import 'package:bro/services/auth/auth_service.dart';
+import 'package:bro/services/notification/firebase_noti.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import './screens/homePage.dart';
@@ -9,10 +10,16 @@ import './screens/loginPage.dart';
 import './screens/registerPage.dart';
 import './services/auth/login_or_register.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:workmanager/workmanager.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:math';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await FirebaseNoti().initNotifications();
   runApp(
     ChangeNotifierProvider(
       create: (context) => AuthService(),
@@ -24,7 +31,6 @@ void main() async{
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -32,10 +38,8 @@ class MyApp extends StatelessWidget {
         primaryColor: const Color(0xFF3E8EDE),
         scaffoldBackgroundColor: Colors.white,
       ),
-      // home: const MyHomePage(title: 'Flutter Demo Home Page'),
       debugShowCheckedModeBanner: false,
       home: const AuthGate(),
     );
   }
 }
-

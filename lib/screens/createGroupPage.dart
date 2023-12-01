@@ -18,6 +18,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   List<String> selectedEmails = [];
   List<String> selectedUIDs = [];
+  List<String> selectedUsernames = [];
 
   // sign out, send to login page thru auth gate
   void signOut() {
@@ -111,10 +112,12 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
               if (value != null && value) {
                 selectedEmails.add(data['email']);
                 selectedUIDs.add(data['uid']);
+                selectedUsernames.add(data['username']);
               }
               else {
                 selectedEmails.remove(data['email']);
                 selectedUIDs.remove(data['uid']);
+                selectedUsernames.add(data['username']);
               }
             });
           },
@@ -137,6 +140,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
             builder: (context) => ChatPage(
               receiverUserEmail: selectedEmails.join(', '),
               receiverUserID: selectedUIDs,
+              receiverUsernames: selectedUsernames.join(', '),
             ),
           ),
         );

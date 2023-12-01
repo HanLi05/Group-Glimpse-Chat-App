@@ -47,7 +47,6 @@ class _RegisterPageState extends State<RegisterPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
 
-                const SizedBox(height: 50),
 
                 const Icon(
                   Icons.message,
@@ -65,7 +64,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
 
-                const SizedBox(height: 30),
+                const SizedBox(height: 15),
 
                 MyTextField(
                     controller: usernameController,

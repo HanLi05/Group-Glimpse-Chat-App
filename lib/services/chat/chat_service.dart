@@ -13,13 +13,16 @@ class ChatService extends ChangeNotifier {
     // get current user info
     final String currentUserId = _firebaseAuth.currentUser!.uid;
     final String currentUserEmail = _firebaseAuth.currentUser!.email.toString();
+    final String currentUsername = await _fetchUsername(_firebaseAuth.currentUser!.uid);
     final Timestamp timestamp = Timestamp.now();
     List<String> participantsEmails = await _fetchParticipantsEmails(receiverId, currentUserEmail);
+    List<String> participantsUsernames = await _fetchParticipantsUsernames(receiverId, currentUsername);
 
     // create new message
     Message newMessage = Message(
       senderId: currentUserId,
       senderEmail: currentUserEmail,
+      senderUsername: currentUsername,
       receiverId: receiverId,
       timestamp: timestamp,
       message: message,
@@ -35,7 +38,9 @@ class ChatService extends ChangeNotifier {
     await _fireStore.collection('chat_rooms').doc(chatRoomId).set({
       'participants': ids,
       'emails': participantsEmails,
+      'users': participantsUsernames,
       'lastUpdated': timestamp,
+      'lastMessage': message,
     }, SetOptions(merge: true));
 
     // add messages to database
@@ -66,6 +71,25 @@ class ChatService extends ChangeNotifier {
     }
 
     return participantsEmails;
+  }
+
+  Future<List<String>> _fetchParticipantsUsernames(List<String> participantUIDs, String currentUsername) async {
+    List<String> participantsEmails = [currentUsername];
+
+    for (String uid in participantUIDs) {
+      DocumentSnapshot userSnapshot = await _fireStore.collection('users').doc(uid).get();
+
+      if (userSnapshot.exists) {
+        participantsEmails.add(userSnapshot['username']);
+      }
+    }
+
+    return participantsEmails;
+  }
+
+  Future<String> _fetchUsername(String userId) async {
+    DocumentSnapshot userSnapshot = await _fireStore.collection('users').doc(userId).get();
+    return userSnapshot.exists ? userSnapshot['username'] : '';
   }
 
 }

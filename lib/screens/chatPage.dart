@@ -9,8 +9,9 @@ import '../testing/messages.dart';
 
 class ChatPage extends StatefulWidget {
   final String receiverUserEmail;
+  final String receiverUsernames;
   final List<String> receiverUserID;
-  ChatPage({super.key, required this.receiverUserEmail, required this.receiverUserID});
+  ChatPage({super.key, required this.receiverUsernames, required this.receiverUserEmail, required this.receiverUserID});
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
@@ -50,13 +51,39 @@ class _ChatScreenState extends State<ChatPage> {
   Widget _buildMessageItem(DocumentSnapshot document) {
     Map<String, dynamic> data = document.data() as Map<String, dynamic>;
     var alignment = (data['senderId'] == _firebaseAuth.currentUser!.uid) ? Alignment.centerRight : Alignment.centerLeft;
+    String senderDisplayName = (alignment == Alignment.centerRight) ? 'You' : (data['senderUsername'] ?? data['senderEmail']);
+
     return Container(
       alignment: alignment,
-      child: Column(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: (alignment == Alignment.centerLeft) ? MainAxisAlignment.start : MainAxisAlignment.end,
         children: [
-          Text(data['senderEmail']),
-          const SizedBox(height: 5),
-          ChatBubble(message: data['message'])
+          if (alignment == Alignment.centerLeft)
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0, top: 20.0),
+              child: CircleAvatar(
+                backgroundColor: Colors.grey,
+                child: Icon(Icons.person, color: Colors.white),
+              ),
+            ),
+          Column(
+            crossAxisAlignment: (alignment == Alignment.centerLeft) ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+            children: [
+              Text(senderDisplayName),
+              const SizedBox(height: 5),
+              ChatBubble(message: data['message']),
+            ],
+          ),
+          if (alignment == Alignment.centerRight)
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0, top: 20.0),
+              child: CircleAvatar(
+                backgroundColor: Colors.grey,
+                child: Icon(Icons.person, color: Colors.white),
+              ),
+            ),
         ],
       ),
     );
@@ -90,7 +117,7 @@ class _ChatScreenState extends State<ChatPage> {
           textAlign: TextAlign.center,
           text: TextSpan(
             children: [
-              TextSpan(text: widget.receiverUserEmail, style: TextStyle(
+              TextSpan(text: widget.receiverUsernames, style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w400,
               ),),
@@ -104,22 +131,7 @@ class _ChatScreenState extends State<ChatPage> {
               Navigator.pop(context);
             }),
       ),
-      // body: Column(
-      //   children: <Widget>[
-      //     Expanded(
-      //       child: ListView.builder(
-      //           reverse: true,
-      //           padding: EdgeInsets.all(20),
-      //           itemCount: messages.length,
-      //           itemBuilder: (BuildContext context, int index) {
-      //             final Message message = messages[index];
-      //             final bool isCurrent = message.sender.id == currentUser.id;
-      //             return _ChatBubble(message, isCurrent);
-      //           }
-      //       ),
-      //     ),
-      //   ],
-      // ),
+
       body: Column(
         children: [
           Expanded(
