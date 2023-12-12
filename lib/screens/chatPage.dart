@@ -24,7 +24,7 @@ class _ChatScreenState extends State<ChatPage> {
 
   void sendMessage() async {
     if (_messageController.text.isNotEmpty) {
-      await _chatService.sendMessage(widget.receiverUserID, _messageController.text);
+      await _chatService.sendMessage(widget.receiverUserID, _messageController.text, false);
     _messageController.clear();
     }
   }
@@ -53,6 +53,11 @@ class _ChatScreenState extends State<ChatPage> {
     var alignment = (data['senderId'] == _firebaseAuth.currentUser!.uid) ? Alignment.centerRight : Alignment.centerLeft;
     String senderDisplayName = (alignment == Alignment.centerRight) ? 'You' : (data['senderUsername'] ?? data['senderEmail']);
 
+    bool isSpecial = false;
+    if (data.containsKey('special') && data['special'] is bool) {
+      isSpecial = data['special'];
+    }
+
     return Container(
       alignment: alignment,
       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
@@ -73,7 +78,7 @@ class _ChatScreenState extends State<ChatPage> {
             children: [
               Text(senderDisplayName),
               const SizedBox(height: 5),
-              ChatBubble(message: data['message']),
+              ChatBubble(message: data['message'], isSpecial: isSpecial),
             ],
           ),
           if (alignment == Alignment.centerRight)
@@ -139,9 +144,70 @@ class _ChatScreenState extends State<ChatPage> {
           ),
           _buildMessageInput(),
           const SizedBox(height: 25),
+          _buildSpecialMessagesForCurrentDay(),
         ]
       )
     );
 
   }
+
+  Stream<List<DocumentSnapshot>> getSpecialMessagesForCurrentDay() {
+    DateTime now = DateTime.now();
+    DateTime midnight = DateTime(now.year, now.month, now.day, 17, 42, 0);
+
+    return _chatService
+        .getMessages(widget.receiverUserID, _firebaseAuth.currentUser!.uid)
+        .map((snapshot) {
+      List<DocumentSnapshot> specialMessages = snapshot.docs
+          .where((doc) {
+        DateTime messageTimestamp = (doc['timestamp'] as Timestamp).toDate();
+        bool isSpecial = doc['special'] == true || false;
+
+        print('Timestamp: $messageTimestamp, Special: $isSpecial');
+
+        return isSpecial && messageTimestamp.isAfter(midnight);
+      })
+          .toList();
+
+      print('Special Messages: ${specialMessages.length}');
+      return specialMessages;
+    });
+  }
+
+
+
+
+  // Function to display special messages sent on the current day at 11:59 PM
+  Widget _buildSpecialMessagesForCurrentDay() {
+    return StreamBuilder(
+      stream: getSpecialMessagesForCurrentDay(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else if (!snapshot.hasData || (snapshot.data as List).isEmpty) {
+          return const Text('No special messages sent today at 11:59 PM.');
+        } else {
+          return Column(
+            children: [
+              const Text(
+                'Special messages sent today at 11:59 PM:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: (snapshot.data as List).length,
+                  itemBuilder: (context, index) {
+                    return _buildMessageItem((snapshot.data as List)[index]);
+                  },
+                ),
+              ),
+            ],
+          );
+        }
+      },
+    );
+  }
+
 }

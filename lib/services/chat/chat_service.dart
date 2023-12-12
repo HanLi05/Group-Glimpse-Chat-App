@@ -9,7 +9,7 @@ class ChatService extends ChangeNotifier {
   final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
 
   // sending messages
-  Future<void> sendMessage(List<String> receiverId, String message) async {
+  Future<void> sendMessage(List<String> receiverId, String message, bool special) async {
     // get current user info
     final String currentUserId = _firebaseAuth.currentUser!.uid;
     final String currentUserEmail = _firebaseAuth.currentUser!.email.toString();
@@ -26,6 +26,7 @@ class ChatService extends ChangeNotifier {
       receiverId: receiverId,
       timestamp: timestamp,
       message: message,
+      special: special,
     );
 
     // construct chat room id from current user id and receiver id
@@ -90,6 +91,26 @@ class ChatService extends ChangeNotifier {
   Future<String> _fetchUsername(String userId) async {
     DocumentSnapshot userSnapshot = await _fireStore.collection('users').doc(userId).get();
     return userSnapshot.exists ? userSnapshot['username'] : '';
+  }
+
+  Future<String> fetchUserIdByDisplayName(String displayName) async {
+    try {
+      QuerySnapshot userSnapshot = await _fireStore
+          .collection('users')
+          .where('username', isEqualTo: displayName)
+          .get();
+
+      if (userSnapshot.docs.isNotEmpty) {
+        return userSnapshot.docs[0].id;
+      } else {
+        // Handle the case where the user with the given display name is not found
+        return ''; // You may want to return a default value or handle this case differently
+      }
+    } catch (error) {
+      // Handle any potential errors
+      print('Error fetching user ID by display name: $error');
+      return ''; // You may want to return a default value or handle this case differently
+    }
   }
 
 }
