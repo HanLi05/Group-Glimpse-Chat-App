@@ -48,6 +48,22 @@ class ChatService extends ChangeNotifier {
     await _fireStore.collection('chat_rooms').doc(chatRoomId).collection('messages').add(newMessage.toMap());
   }
 
+  Stream<QuerySnapshot> getSpecialMessages(String userId) {
+    List<String> ids = [userId];
+    // Assuming you want to fetch special messages where the given user is a participant
+    String chatRoomId = ids.join("_");
+
+    return _fireStore
+        .collection('chat_rooms')
+        .doc(chatRoomId)
+        .collection('messages')
+        .where('special', isEqualTo: true)
+        .orderBy('timestamp', descending: false)
+        .snapshots();
+  }
+
+
+
   // getting messages
   Stream<QuerySnapshot> getMessages(List<String> userId, String otherUserId) {
     // construct chat_room id
@@ -112,6 +128,7 @@ class ChatService extends ChangeNotifier {
       return ''; // You may want to return a default value or handle this case differently
     }
   }
+
 
 }
 

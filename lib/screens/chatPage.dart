@@ -1,4 +1,5 @@
 import 'package:bro/components/text_field.dart';
+import 'package:bro/screens/specialMessagesPage.dart';
 import 'package:bro/services/chat/chat_bubble.dart';
 import 'package:bro/services/chat/chat_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -22,6 +23,8 @@ class _ChatScreenState extends State<ChatPage> {
   final ChatService _chatService = ChatService();
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
+  List<DocumentSnapshot> specialMessages = [];
+
   void sendMessage() async {
     if (_messageController.text.isNotEmpty) {
       await _chatService.sendMessage(widget.receiverUserID, _messageController.text, false);
@@ -29,7 +32,9 @@ class _ChatScreenState extends State<ChatPage> {
     }
   }
 
+
   Widget _buildMessageList() {
+    specialMessages = [];
     return StreamBuilder(stream: _chatService.getMessages(
       widget.receiverUserID, _firebaseAuth.currentUser!.uid),
       builder: (context, snapshot) {
@@ -56,6 +61,11 @@ class _ChatScreenState extends State<ChatPage> {
     bool isSpecial = false;
     if (data.containsKey('special') && data['special'] is bool) {
       isSpecial = data['special'];
+    }
+
+    if (isSpecial) {
+      // Add special messages to the list
+      specialMessages.add(document);
     }
 
     return Container(
@@ -93,6 +103,8 @@ class _ChatScreenState extends State<ChatPage> {
       ),
     );
   }
+
+
 
   Widget _buildMessageInput() {
     return Padding(
@@ -144,70 +156,21 @@ class _ChatScreenState extends State<ChatPage> {
           ),
           _buildMessageInput(),
           const SizedBox(height: 25),
-          _buildSpecialMessagesForCurrentDay(),
-        ]
-      )
+          ElevatedButton(
+            onPressed: () {
+              print(specialMessages.length);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SpecialMessagesPage(specialMessages: specialMessages, userId: widget.receiverUserID[0]),                ),
+              );
+            },
+            child: Text('Special Messages'),
+          ),
+        ],
+      ),
     );
 
-  }
-
-  Stream<List<DocumentSnapshot>> getSpecialMessagesForCurrentDay() {
-    DateTime now = DateTime.now();
-    DateTime midnight = DateTime(now.year, now.month, now.day, 17, 42, 0);
-
-    return _chatService
-        .getMessages(widget.receiverUserID, _firebaseAuth.currentUser!.uid)
-        .map((snapshot) {
-      List<DocumentSnapshot> specialMessages = snapshot.docs
-          .where((doc) {
-        DateTime messageTimestamp = (doc['timestamp'] as Timestamp).toDate();
-        bool isSpecial = doc['special'] == true || false;
-
-        print('Timestamp: $messageTimestamp, Special: $isSpecial');
-
-        return isSpecial && messageTimestamp.isAfter(midnight);
-      })
-          .toList();
-
-      print('Special Messages: ${specialMessages.length}');
-      return specialMessages;
-    });
-  }
-
-
-
-
-  // Function to display special messages sent on the current day at 11:59 PM
-  Widget _buildSpecialMessagesForCurrentDay() {
-    return StreamBuilder(
-      stream: getSpecialMessagesForCurrentDay(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
-        } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        } else if (!snapshot.hasData || (snapshot.data as List).isEmpty) {
-          return const Text('No special messages sent today at 11:59 PM.');
-        } else {
-          return Column(
-            children: [
-              const Text(
-                'Special messages sent today at 11:59 PM:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: (snapshot.data as List).length,
-                  itemBuilder: (context, index) {
-                    return _buildMessageItem((snapshot.data as List)[index]);
-                  },
-                ),
-              ),
-            ],
-          );
-        }
-      },
-    );
   }
 
 }
