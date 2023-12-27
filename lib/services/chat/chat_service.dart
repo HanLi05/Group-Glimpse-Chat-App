@@ -62,6 +62,49 @@ class ChatService extends ChangeNotifier {
         .snapshots();
   }
 
+  Future<void> deleteChatCollection(BuildContext context, List<String> userIds) async {
+    userIds.add(_firebaseAuth.currentUser!.uid); // Add current user ID
+    userIds.sort(); // Sort the list
+
+    // Display confirmation dialog
+    bool confirmDelete = await _showDeleteConfirmationDialog(context);
+
+    if (confirmDelete) {
+      try {
+        String chatRoomId = userIds.join("_"); // Generate chatRoomId from sorted list
+        await _fireStore.collection('chat_rooms').doc(chatRoomId).delete();
+      } catch (e) {
+        print('error deleting chat collection: $e');
+        // Handle error as needed
+      }
+    }
+  }
+
+  Future<bool> _showDeleteConfirmationDialog(BuildContext context) async {
+    return await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirm Deletion'),
+          content: Text('Warning: Deleting the chat will delete it for everyone. Do you want to proceed?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true); // User confirmed delete
+              },
+              child: Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false); // User canceled delete
+              },
+              child: Text('No'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
 
   // getting messages

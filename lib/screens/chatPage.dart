@@ -1,4 +1,5 @@
 import 'package:bro/components/text_field.dart';
+import 'package:bro/screens/homePage.dart';
 import 'package:bro/screens/specialMessagesPage.dart';
 import 'package:bro/services/chat/chat_bubble.dart';
 import 'package:bro/services/chat/chat_service.dart';
@@ -32,6 +33,16 @@ class _ChatScreenState extends State<ChatPage> {
     }
   }
 
+  void _deleteCollection() async {
+    await _chatService.deleteChatCollection(context, widget.receiverUserID);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HomePage(), // Replace YourHomePage with the actual homepage widget
+      ),
+    );
+    // Add any additional logic after the collection is deleted
+  }
 
   Widget _buildMessageList() {
     specialMessages = [];
@@ -147,6 +158,13 @@ class _ChatScreenState extends State<ChatPage> {
             onPressed: () {
               Navigator.pop(context);
             }),
+
+        actions: [
+          IconButton(
+              onPressed: _deleteCollection,
+              icon: Icon(Icons.delete),
+          ),
+        ],
       ),
 
       body: Column(

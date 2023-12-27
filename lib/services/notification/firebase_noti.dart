@@ -28,20 +28,6 @@ class FirebaseNoti {
 
 
   Future initPushNotifications() async {
-    //   FirebaseMessaging.onMessage.listen(handleMessage);
-    //
-    //   FirebaseMessaging.onMessageOpenedApp.listen((message) {
-    //     handleMessage(message);
-    //   });
-    //
-    //   // Check if the app was opened by tapping the notification
-    //   FirebaseMessaging.instance.getInitialMessage().then((message) {
-    //     if (message != null) {
-    //       handleMessage(message);
-    //     }
-    //   });
-    // }
-
     FirebaseMessaging.instance.getInitialMessage().then(handleMessage);
 
     FirebaseMessaging.onMessageOpenedApp.listen(handleMessage);

@@ -27,13 +27,13 @@ class SpecialMessagesPage extends StatelessWidget {
         itemCount: specialMessages.length,
         itemBuilder: (context, index) {
           final DocumentSnapshot document = specialMessages[index];
-          return _buildSpecialMessageItem(document);
+          return _buildSpecialMessageItem(document, index);
         },
       ),
     );
   }
 
-  Widget _buildSpecialMessageItem(DocumentSnapshot document) {
+  Widget _buildSpecialMessageItem(DocumentSnapshot document, int index) {
     Map<String, dynamic> data = document.data() as Map<String, dynamic>;
     var alignment = data['senderId'] == userId
         ? Alignment.centerRight
@@ -57,19 +57,21 @@ class SpecialMessagesPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          height: 1,
-          color: Colors.black,
-          margin: const EdgeInsets.symmetric(vertical: 8.0),
-        ),
-        Container(
-          alignment: Alignment.center,
-          margin: const EdgeInsets.symmetric(vertical: 8.0),
-          child: Text(
-            _formatDate(messageDate),
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        if (isNewDate)
+          Container(
+            height: 1,
+            color: Colors.black,
+            margin: const EdgeInsets.symmetric(vertical: 8.0),
           ),
-        ),
+        if (isNewDate)
+          Container(
+            alignment: Alignment.center,
+            margin: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Text(
+              _formatDate(messageDate),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ),
         Container(
           alignment: alignment,
           padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
@@ -79,10 +81,6 @@ class SpecialMessagesPage extends StatelessWidget {
                 ? MainAxisAlignment.start
                 : MainAxisAlignment.end,
             children: [
-              Container(
-                width: 16.0,
-                color: Colors.black,
-              ),
               if (alignment == Alignment.centerLeft)
                 Padding(
                   padding: const EdgeInsets.only(right: 8.0, top: 20.0),
@@ -109,10 +107,6 @@ class SpecialMessagesPage extends StatelessWidget {
                     child: Icon(Icons.person, color: Colors.white),
                   ),
                 ),
-              Container(
-                width: 16.0,
-                color: Colors.black,
-              ),
             ],
           ),
         ),
