@@ -58,6 +58,7 @@ class _ChatScreenState extends State<ChatPage> {
         }
 
         return ListView(
+          reverse: true,
           children: snapshot.data!.docs.map((document) => _buildMessageItem(document)).toList(),
         );
       },

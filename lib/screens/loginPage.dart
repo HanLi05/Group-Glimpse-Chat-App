@@ -4,8 +4,9 @@ import 'package:bro/services/auth/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
-
+// login page
 class LoginPage extends StatefulWidget {
+  // callback function when register now link is clicked
   final void Function()? onTap;
   const LoginPage({super.key, required this.onTap});
 
@@ -14,15 +15,20 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  // controllers for email and password text fields
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
+  // sign in function
   void signIn() async {
+    // access auth service
     final authService = Provider.of<AuthService>(context, listen: false);
     try {
+      // call sign in method from auth service using user inputs for username and password
       await authService.signInWithEmailAndPassword(emailController.text, passwordController.text);
     }
     catch (e) {
+      // handle errors
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -33,10 +39,10 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  // build UI
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // here
       backgroundColor: const Color(0xFF1976D2),
       body: SafeArea(
         child: Center(
@@ -45,49 +51,39 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-
                 const SizedBox(height: 50),
-
                 Icon(
                   Icons.message,
                   size: 125,
-                  // here
                   color: Colors.white,
                 ),
-
                 const SizedBox(height: 10),
-
                 const Text(
                   'Welcome back!',
                   style: TextStyle(
                     fontSize: 16,
-                    // here (delete line)
                     color: Colors.white,
                   ),
                 ),
-
                 const SizedBox(height: 30),
-
+                // custom text field for entering email
                 MyTextField(
                   controller: emailController,
                   hintText: 'Email',
                   obscureText: false
                 ),
-
                 const SizedBox(height: 15),
-
+                // custom text field for entering password
                 MyTextField(
                     controller: passwordController,
                     hintText: 'Password',
                     obscureText: true,
                 ),
-
                 const SizedBox(height: 15),
-
+                // custom button for signing in
                 MyButton(onTap: signIn, text: "Sign in"),
-
                 const SizedBox(height: 20),
-
+                // not a member message with register link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

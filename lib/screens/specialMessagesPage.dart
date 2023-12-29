@@ -11,6 +11,7 @@ import '../testing/messages.dart';
 class SpecialMessagesPage extends StatelessWidget {
   final List<DocumentSnapshot> specialMessages;
   final String userId;
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   SpecialMessagesPage({Key? key, required this.specialMessages, required this.userId})
       : super(key: key);
@@ -35,11 +36,8 @@ class SpecialMessagesPage extends StatelessWidget {
 
   Widget _buildSpecialMessageItem(DocumentSnapshot document, int index) {
     Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-    var alignment = data['senderId'] == userId
-        ? Alignment.centerRight
-        : Alignment.centerLeft;
-    String senderDisplayName =
-    alignment == Alignment.centerRight ? 'You' : data['senderUsername'];
+    var alignment = (data['senderId'] == _firebaseAuth.currentUser!.uid) ? Alignment.centerRight : Alignment.centerLeft;
+    String senderDisplayName = (alignment == Alignment.centerRight) ? 'You' : (data['senderUsername'] ?? data['senderEmail']);
     bool isSpecial = true;
 
     Timestamp timestamp = data['timestamp'] as Timestamp;
@@ -77,9 +75,7 @@ class SpecialMessagesPage extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: alignment == Alignment.centerLeft
-                ? MainAxisAlignment.start
-                : MainAxisAlignment.end,
+            mainAxisAlignment: (alignment == Alignment.centerLeft) ? MainAxisAlignment.start : MainAxisAlignment.end,
             children: [
               if (alignment == Alignment.centerLeft)
                 Padding(
@@ -90,9 +86,7 @@ class SpecialMessagesPage extends StatelessWidget {
                   ),
                 ),
               Column(
-                crossAxisAlignment: alignment == Alignment.centerLeft
-                    ? CrossAxisAlignment.start
-                    : CrossAxisAlignment.end,
+                crossAxisAlignment: (alignment == Alignment.centerLeft) ? CrossAxisAlignment.start : CrossAxisAlignment.end,
                 children: [
                   Text(senderDisplayName),
                   const SizedBox(height: 5),
@@ -110,6 +104,12 @@ class SpecialMessagesPage extends StatelessWidget {
             ],
           ),
         ),
+        if (index == specialMessages.length - 1)
+          Container(
+            height: 1,
+            color: Colors.black,
+            margin: const EdgeInsets.symmetric(vertical: 8.0),
+          ),
       ],
     );
   }
