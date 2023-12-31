@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:bro/screens/loginPage.dart';
 import 'package:bro/screens/registerPage.dart';
 
+// toggle between the login and register pages
 class LoginOrRegister extends StatefulWidget {
   const LoginOrRegister({super.key});
 
@@ -10,8 +11,10 @@ class LoginOrRegister extends StatefulWidget {
 }
 
 class _LoginOrRegisterState extends State<LoginOrRegister> {
+  // bool to determine whether to show login or register
   bool showLoginPage = true;
 
+  // toggle
   void togglePages() {
     setState(() {
       showLoginPage = !showLoginPage;
@@ -20,6 +23,7 @@ class _LoginOrRegisterState extends State<LoginOrRegister> {
 
   @override
   Widget build(BuildContext context) {
+    // show appropriate page based on bool
     if (showLoginPage) {
       return LoginPage(onTap: togglePages);
     }

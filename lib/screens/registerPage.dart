@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:bro/services/auth/auth_service.dart';
 import 'package:provider/provider.dart';
 
+// register page that creates an account for the user in firebase based on inputs
 class RegisterPage extends StatefulWidget {
+  // callback function when sign in link is clicked
   final void Function()? onTap;
   const RegisterPage({super.key, required this.onTap});
 
@@ -13,23 +15,27 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  // controllers for email, password x2, and username
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
   final usernameController = TextEditingController();
 
+  // sign up method
   void signUp() async {
     // error if passwords don't match
     if (passwordController.text != confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Passwords do not match"),),);
     return;
     }
-    // get auth service if match
+    // get auth service if passwords match
     final authService = Provider.of<AuthService>(context, listen:false);
 
+    // call auth service method using controller inputs
     try {
       await authService.signUpWithEmailandPassword(emailController.text, passwordController.text, usernameController.text);
     }
+    // catch and display errors
     catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString()),),);
     }
@@ -46,8 +52,6 @@ class _RegisterPageState extends State<RegisterPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-
-
                 const Icon(
                   Icons.message,
                   size: 125,
@@ -66,6 +70,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                 const SizedBox(height: 15),
 
+                // username text field
                 MyTextField(
                     controller: usernameController,
                     hintText: 'Username',
@@ -74,6 +79,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                 const SizedBox(height: 10),
 
+                // email text field
                 MyTextField(
                   controller: emailController,
                   hintText: 'Email',
@@ -82,14 +88,16 @@ class _RegisterPageState extends State<RegisterPage> {
 
                 const SizedBox(height: 10),
 
+                // password text field
                 MyTextField(
-                    controller: passwordController,
-                    hintText: 'Password',
-                    obscureText: true,
+                  controller: passwordController,
+                  hintText: 'Password',
+                  obscureText: true,
                 ),
 
                 const SizedBox(height: 10),
 
+                // confirm password text field
                 MyTextField(
                   controller: confirmPasswordController,
                   hintText: 'Confirm Password',
@@ -102,6 +110,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                 const SizedBox(height: 15),
 
+                // login in link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

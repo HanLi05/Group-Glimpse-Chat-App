@@ -1,5 +1,4 @@
 import 'package:bro/screens/homePage.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -11,11 +10,16 @@ class SendMessagePage extends StatefulWidget {
 }
 
 class _SendMessagePageState extends State<SendMessagePage> {
+  // instances of firebase auth and firestore
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
+  // text editing controller for typing special message
   final TextEditingController _messageController = TextEditingController();
+  // list of groups that user has selected to send messages to
   List<String> selectedGroups = [];
+  // list of bools describing which groups are checked
   List<bool> checkedStates = [];
+  // chat service
   final ChatService _chatService = ChatService();
 
   @override
@@ -24,28 +28,27 @@ class _SendMessagePageState extends State<SendMessagePage> {
     fetchUserGroups();
   }
 
-
+  // function to fetch group chats that include current user id
   void fetchUserGroups() async {
-    // Fetch all group chats that include the current user's UID
-    QuerySnapshot chatRoomsSnapshot = await _fireStore
-        .collection('chat_rooms')
-        .where('participants', arrayContains: _auth.currentUser!.uid)
-        .get();
+    QuerySnapshot chatRoomsSnapshot = await _fireStore.collection('chat_rooms').where('participants', arrayContains: _auth.currentUser!.uid).get();
 
     List<String> groups = [];
     List<bool> states = [];
 
+    // iterate thru each chat room (already filtered)
     for (QueryDocumentSnapshot doc in chatRoomsSnapshot.docs) {
+      // remove current user
       List<dynamic> users = doc['participants'];
-      // Exclude the current user from the list
       users.remove(_auth.currentUser!.uid);
 
+      // create list for the display names of participants in a chat room
       List<String> displayNames = await fetchDisplayNames(users.cast<String>());
 
-      // Join the remaining display names with commas
+      // join the list items using comma
       String group = displayNames.join(', ');
       groups.add(group);
-      states.add(true); // Initialize all groups as checked initially
+      // initial checkboxes are checked
+      states.add(true);
     }
 
     setState(() {
@@ -54,9 +57,11 @@ class _SendMessagePageState extends State<SendMessagePage> {
     });
   }
 
+  // function to return list of usernames based on a list of user ids
   Future<List<String>> fetchDisplayNames(List<String> uids) async {
     List<String> displayNames = [];
 
+    // iterate thru ids and get corresponding username value from users collection
     for (String uid in uids) {
       DocumentSnapshot userSnapshot =
       await _fireStore.collection('users').doc(uid).get();
@@ -70,51 +75,14 @@ class _SendMessagePageState extends State<SendMessagePage> {
     return displayNames;
   }
 
-  // void _sendMessage() async {
-  //   String message = _messageController.text.trim();
-  //
-  //   if (message.isNotEmpty) {
-  //     for (int i = 0; i < selectedGroups.length; i++) {
-  //       if (checkedStates[i]) {
-  //         // Get the roomId based on the groupName
-  //         QuerySnapshot chatRoomSnapshot = await _fireStore
-  //             .collection('chat_rooms')
-  //             .where('participants', arrayContains: _auth.currentUser!.uid)
-  //             .get();
-  //
-  //         if (chatRoomSnapshot.docs.isNotEmpty) {
-  //           String roomId = chatRoomSnapshot.docs[i].id;
-  //
-  //           // Send the message to each selected group chat
-  //           await _fireStore.collection('chat_rooms').doc(roomId).collection('messages').add({
-  //             'text': message,
-  //             'senderId': _auth.currentUser!.uid,
-  //             'timestamp': FieldValue.serverTimestamp(),
-  //             'special': true,
-  //           });
-  //
-  //           // Update the last message and last updated time in the chat_rooms collection
-  //           await _fireStore.collection('chat_rooms').doc(roomId).update({
-  //             'lastMessage': message,
-  //             'lastUpdated': FieldValue.serverTimestamp(),
-  //           });
-  //         }
-  //       }
-  //     }
-  //
-  //     // Clear the text field after sending the message
-  //     _messageController.clear();
-  //
-  //     Navigator.pop(context);
-  //   }
-  // }
-
+  // function to send message using chat service
   void _sendMessage() async {
     String message = _messageController.text.trim();
-
+    // loop thru the selected groups
     if (message.isNotEmpty) {
       for (int i = 0; i < selectedGroups.length; i++) {
         if (checkedStates[i]) {
+          // transform the display names of the groups into ids
           List<String> receiverIds = [];
           List<String> displayNames = selectedGroups[i].split(', ');
 
@@ -127,42 +95,44 @@ class _SendMessagePageState extends State<SendMessagePage> {
         }
       }
 
-      // Clear the text field after sending the message
+      // clear field and return to previous page
       _messageController.clear();
 
       Navigator.pop(context);
     }
   }
 
-
-
+  // build
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        // leading back arrow button, direct to previous page
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => HomePage(),
+                builder: (context) => const HomePage(),
               ),
             );
           },
         ),
-        title: Text('Group Glimpse Message'),
+        title: const Text('Group Glimpse Message'),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            // message controller for message input
             TextField(
               controller: _messageController,
-              decoration: InputDecoration(labelText: 'Enter your message'),
+              decoration: const InputDecoration(labelText: 'Enter your message'),
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             Expanded(
+              // list of groups with checked box logic
               child: ListView.builder(
                 itemCount: selectedGroups.length,
                 itemBuilder: (context, index) {
@@ -178,9 +148,10 @@ class _SendMessagePageState extends State<SendMessagePage> {
                 },
               ),
             ),
+            // send message button
             ElevatedButton(
               onPressed: _sendMessage,
-              child: Text('Send Message'),
+              child: const Text('Send Message'),
             ),
           ],
         ),

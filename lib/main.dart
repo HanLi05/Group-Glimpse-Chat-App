@@ -5,13 +5,7 @@ import 'package:bro/services/auth/auth_service.dart';
 import 'package:bro/services/notification/firebase_noti.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import './screens/homePage.dart';
-// import './screens/homePageBackup.dart';
-import './screens/loginPage.dart';
-import './screens/registerPage.dart';
-import './services/auth/login_or_register.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:bro/firebase_options.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 

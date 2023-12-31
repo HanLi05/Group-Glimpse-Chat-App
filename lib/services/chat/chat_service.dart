@@ -1,4 +1,3 @@
-import 'package:bro/testing/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -48,31 +47,49 @@ class ChatService extends ChangeNotifier {
     await _fireStore.collection('chat_rooms').doc(chatRoomId).collection('messages').add(newMessage.toMap());
   }
 
+  // get the special messages of a given group
   Stream<QuerySnapshot> getSpecialMessages(String userId) {
+    // create chat room using userIds of members
     List<String> ids = [userId];
-    // Assuming you want to fetch special messages where the given user is a participant
     String chatRoomId = ids.join("_");
 
-    return _fireStore
-        .collection('chat_rooms')
-        .doc(chatRoomId)
-        .collection('messages')
-        .where('special', isEqualTo: true)
-        .orderBy('timestamp', descending: false)
-        .snapshots();
+    // return the collection of messages, filtered by special and ordered by timestamp
+    return _fireStore.collection('chat_rooms').doc(chatRoomId).collection('messages').where('special', isEqualTo: true).orderBy('timestamp', descending: false).snapshots();
   }
 
+  // delete the collection and chat_room
   Future<void> deleteChatCollection(BuildContext context, List<String> userIds) async {
-    userIds.add(_firebaseAuth.currentUser!.uid); // Add current user ID
-    userIds.sort(); // Sort the list
+    // build chat room id
+    userIds.add(_firebaseAuth.currentUser!.uid);
+    userIds.sort();
 
-    // Display confirmation dialog
+    // display confirmation
     bool confirmDelete = await _showDeleteConfirmationDialog(context);
 
+    // delete if confirm
     if (confirmDelete) {
       try {
-        String chatRoomId = userIds.join("_"); // Generate chatRoomId from sorted list
-        await _fireStore.collection('chat_rooms').doc(chatRoomId).delete();
+        String chatRoomId = userIds.join("_");
+
+        // Get a reference to the main chat room document
+        DocumentReference mainChatRoomRef =
+        _fireStore.collection('chat_rooms').doc(chatRoomId);
+
+        // Create a batch
+        WriteBatch batch = _fireStore.batch();
+
+        // Delete documents in the subcollection
+        QuerySnapshot subCollectionSnapshot =
+        await mainChatRoomRef.collection('messages').get();
+        subCollectionSnapshot.docs.forEach((doc) {
+          batch.delete(doc.reference);
+        });
+
+        // Delete the main chat room document
+        batch.delete(mainChatRoomRef);
+
+        // Commit the batch
+        await batch.commit();
       } catch (e) {
         print('error deleting chat collection: $e');
         // Handle error as needed
@@ -80,32 +97,32 @@ class ChatService extends ChangeNotifier {
     }
   }
 
+  // delete confirmation dialog
   Future<bool> _showDeleteConfirmationDialog(BuildContext context) async {
     return await showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Confirm Deletion'),
-          content: Text('Warning: Deleting the chat will delete it for everyone. Do you want to proceed?'),
+          title: const Text('Confirm Deletion'),
+          content: const Text('Warning: Deleting the chat will delete it for everyone. Do you want to proceed?'),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(true); // User confirmed delete
               },
-              child: Text('Yes'),
+              child: const Text('Yes'),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(false); // User canceled delete
               },
-              child: Text('No'),
+              child: const Text('No'),
             ),
           ],
         );
       },
     );
   }
-
 
   // getting messages
   Stream<QuerySnapshot> getMessages(List<String> userId, String otherUserId) {
@@ -133,42 +150,41 @@ class ChatService extends ChangeNotifier {
     return participantsEmails;
   }
 
+  // get the usernames given their ids
   Future<List<String>> _fetchParticipantsUsernames(List<String> participantUIDs, String currentUsername) async {
-    List<String> participantsEmails = [currentUsername];
+    // add the current user's username to have all usernames within group
+    List<String> participantsUsernames = [currentUsername];
 
     for (String uid in participantUIDs) {
       DocumentSnapshot userSnapshot = await _fireStore.collection('users').doc(uid).get();
 
       if (userSnapshot.exists) {
-        participantsEmails.add(userSnapshot['username']);
+        participantsUsernames.add(userSnapshot['username']);
       }
     }
 
-    return participantsEmails;
+    return participantsUsernames;
   }
 
+  // get the username given userId from 'users' collection
   Future<String> _fetchUsername(String userId) async {
     DocumentSnapshot userSnapshot = await _fireStore.collection('users').doc(userId).get();
     return userSnapshot.exists ? userSnapshot['username'] : '';
   }
 
+  // get the id given username
   Future<String> fetchUserIdByDisplayName(String displayName) async {
     try {
-      QuerySnapshot userSnapshot = await _fireStore
-          .collection('users')
-          .where('username', isEqualTo: displayName)
-          .get();
+      QuerySnapshot userSnapshot = await _fireStore.collection('users').where('username', isEqualTo: displayName).get();
 
       if (userSnapshot.docs.isNotEmpty) {
         return userSnapshot.docs[0].id;
       } else {
-        // Handle the case where the user with the given display name is not found
-        return ''; // You may want to return a default value or handle this case differently
+        return '';
       }
     } catch (error) {
-      // Handle any potential errors
-      print('Error fetching user ID by display name: $error');
-      return ''; // You may want to return a default value or handle this case differently
+      print('error getting uid from username: $error');
+      return '';
     }
   }
 
