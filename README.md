@@ -1,16 +1,13 @@
 # Group Glimpse
 
-A new Flutter project.
+## Project Description
+This app is a chat app that sends notifications randomly to all users, reminding them to update their friends on 
+what they're doing! I used Firebase for the backend, and Flutter/Dart for the frontend. It uses Firebase 
+Authentication for account registration and login, Firestore Database for data storage, and Firebase Messaging
+for notifications. Some of its main features include account registration and login, a live-updated message 
+dashboard, group creation and deletion, and the notification system that prompts users for a special message. For 
+a brief demo of the app, click this link to see a video: https://youtu.be/HKsPSIeBMkM
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Credits
+Revised snippets of code from this video: https://www.youtube.com/watch?v=mBBycL0EtBQ. It provided a baseline for 
+user registration and login, as well as very basic single-user message sending capabilities. 
