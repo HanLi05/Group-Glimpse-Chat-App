@@ -9,9 +9,9 @@ dashboard, group creation and deletion, and the notification system that prompts
 a brief demo of the app, click this link to see a video: https://youtu.be/HKsPSIeBMkM
 
 ## Screnshots of App Screens
-Login:
+### Login:
 <img width="265" alt="image" src="https://github.com/HanLi05/Group-Glimpse-Chat-App/assets/76186942/878ff5cb-57b7-44d8-abc9-6b3f615c6a71">
-Register: 
+### Register: 
 <img width="266" alt="image" src="https://github.com/HanLi05/Group-Glimpse-Chat-App/assets/76186942/dc95f1dd-c81d-4783-a006-0b750c5735c4">
 Chat Dashbooard:
 <img width="262" alt="image" src="https://github.com/HanLi05/Group-Glimpse-Chat-App/assets/76186942/d2ad01f6-bb10-429c-97b5-3b3e4a41b6ee">
