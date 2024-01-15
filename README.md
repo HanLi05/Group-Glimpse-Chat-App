@@ -13,3 +13,5 @@ Revised snippets of code from this video: https://www.youtube.com/watch?v=mBBycL
 user registration and login, as well as very basic single-user message sending capabilities. 
 
 <img width="192" alt="image" src="https://github.com/HanLi05/Group-Glimpse-Chat-App/assets/76186942/e3ae908d-f187-4c6c-aa48-81234c36bd42">
+<img width="162" alt="image" src="https://github.com/HanLi05/Group-Glimpse-Chat-App/assets/76186942/b007daaf-adad-44af-9b6b-622e3aa6111e">
+
