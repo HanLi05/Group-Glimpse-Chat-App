@@ -18,13 +18,19 @@ a brief demo of the app, click this link to see a video: https://youtu.be/HKsPSI
 ### Chat Dashbooard:
 <img width="262" alt="image" src="https://github.com/HanLi05/Group-Glimpse-Chat-App/assets/76186942/d2ad01f6-bb10-429c-97b5-3b3e4a41b6ee">
 
-### 
+### Chat Page:
 <img width="263" alt="image" src="https://github.com/HanLi05/Group-Glimpse-Chat-App/assets/76186942/ae4ee7bc-593b-4f28-8b32-6863db557c17">
+
+### Special Message Log:
 <img width="264" alt="image" src="https://github.com/HanLi05/Group-Glimpse-Chat-App/assets/76186942/385bc666-4e68-4132-9e75-effde32a215d">
+
+### Create Group Chat Page:
 <img width="269" alt="image" src="https://github.com/HanLi05/Group-Glimpse-Chat-App/assets/76186942/a6b21506-dd5d-4f5a-aa9e-9cfb8dee4cbd">
+
+### Profile Page:
 <img width="271" alt="image" src="https://github.com/HanLi05/Group-Glimpse-Chat-App/assets/76186942/2981f7b1-dc45-4512-9d2c-2f266b0d14d2">
 
-### 
+### Getting Group Glimpse Notification:
 <img width="265" alt="image" src="https://github.com/HanLi05/Group-Glimpse-Chat-App/assets/76186942/f1bca8e7-3ff6-47a9-afa6-77fc14212afe">
 
 ### Click Notification - Send Group Glimpse Special Message:
