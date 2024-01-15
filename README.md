@@ -11,3 +11,5 @@ a brief demo of the app, click this link to see a video: https://youtu.be/HKsPSI
 ## Credits
 Revised snippets of code from this video: https://www.youtube.com/watch?v=mBBycL0EtBQ. It provided a baseline for 
 user registration and login, as well as very basic single-user message sending capabilities. 
+
+<img width="192" alt="image" src="https://github.com/HanLi05/Group-Glimpse-Chat-App/assets/76186942/e3ae908d-f187-4c6c-aa48-81234c36bd42">
